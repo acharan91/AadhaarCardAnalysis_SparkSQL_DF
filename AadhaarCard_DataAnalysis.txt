@@ -1,0 +1,58 @@
+KPI-1 
+1. View/result of the top 25 rows from each individual store 
+Query: select _c2 from aadhaar group by _c2 LIMIT 25
+
+KPI-2 
+1. Find the count and names of registrars in the table.
+Query: select count(_c1) as Registrar_count,_c1 from aadhaar group by _c1 order by _c1
+ 
+2. Find the number of states, districts in each state and sub-districts in each district.
+Query: select _c3,count(distinct _c4 ) as Districts,count(distinct _c5) as Sub_district from aadhaar  group by _c3
+
+3. Find the number of males and females in each state from the table. 
+Query: select _c3,count(_c7) as Male_count from aadhaar where (_c7='M') group by _c3
+Query: select _c3,count(_c7) as Female_count from aadhaar where (_c7='F') group by _c3
+
+4. Find out the names of private agencies for each state
+Query: select _c3,count(_c2) as Private_Agencies from aadhaar group by _c3 
+
+KPI-3 
+1. Find top 3 states generating most number of Aadhaar cards? 
+Query: select _c3,sum(_c9) as Aadhaar_generated from aadhaar group by _c3 order by Aadhaar_generated DESC LIMIT 3
+
+2. Find top 3 private agencies generating the most number of Aadhar cards? 
+Query: select _c2,sum(_c9)as Aadhaar_generated from aadhaar group by _c2 order by Aadhaar_generated DESC LIMIT 3
+
+3. Find the number of residents providing email, mobile number? (Hint: consider non-zero values.) 
+Query: select sum(_c11)as mobile_count,sum(_c12) as email_count from aadhaar where _c11!=0 and _c12!=0
+
+4. Find top 3 districts where enrolment numbers are maximum? 
+Query: select _c4, max(_c9) as maxEnrollment from aadhaar group by _c4 order by maxEnrollment DESC LIMIT  3
+
+5. Find the no. of Aadhaar cards generated in each state?
+Query: select _c3,sum(_c9) from aadhaar group by _c3
+
+KPI-4 
+1. Write a command to see the correlation between “age” and “mobile_number”? (Hint: Consider the percentage of people who have provided the mobile number out of the total applicants) 
+Query: select age1._c8,(mobile_per*100/total_applicants) as mobile_percentage from (select _c8, sum(_c11) as mobile_per from aadhaar group by _c8) as age1 join (select _c8,(sum(_c9)+sum(_c10)) total_applicants from aadhaar group by _c8 ) as age2 on age1._c8=age2._c8 order by mobile_percentage DESC
+
+2. Find the number of unique pincodes in the data?
+Query: select distinct(_c6) as pincode from aadhaar 
+
+3. Find the number of Aadhaar registrations rejected in Uttar Pradesh and Maharashtra
+Query: select _c3, sum(_c10) as Aadhaar_rejected from  _c3='Uttar Pradesh' group by _c3
+       select _c3, sum(_c10) as Aadhaar_rejected from  _c3='Maharashtra' group by _c3
+KPI-5 
+1. The top 3 states where the percentage of Aadhaar cards being generated for males is the highest. 
+Query: select per1._c3,(male_per*100/total_per) as percentage from (select _c3, sum(_c9) as male_per from aadhaar where _c7='M' group by _c3) as per1 join (select _c3,sum(_c9) total_per from aadhaar group by _c3) as per2 on per1._c3=per2._c3 order by percentage DESC LIMIT 3
+
+2. In each of these 3 states, identify the top 3 districts where the percentage of Aadhaar cards being rejected for females is the highest. 
+Note: Manipur is highest in th list ffor KPI-5.1
+Query: select per1._c4,(female_per*100/total_per) as percentage from (select _c4, sum(_c10) as female_per from aadhaar where _c7='F' AND _c3='Manipur' group by _c4) as per1 join (select _c4,sum(_c10) total_per from aadhaar where _c3='Manipur' group by _c4 ) as per2 on per1._c4=per2._c4 order by percentage DESC LIMIT 3
+
+3. The top 3 states where the percentage of Aadhaar cards being generated for females is the highest. 
+Query: select per1._c3,(female_per*100/total_per) as percentage from (select _c3, sum(_c9) as female_per from aadhaar where _c7='F' group by _c3) as per1 join (select _c3,sum(_c9) total_per from aadhaar group by _c3) as per2 on per1._c3=per2._c3 order by percentage DESC LIMIT 3 
+
+4. In each of these 3 states, identify the top 3 districts where the percentage of Aadhaar cards being rejected for males is the highest. 
+Note: Andaman and Nicobar Islands is highest in th list ffor KPI-5.3
+Query: select per1._c4,(male_per*100/total_per) as percentage from (select _c4, sum(_c10) as male_per from aadhaar where _c7='M' AND _c3='Andaman and Nicobar Islands' group by _c4) as per1 join (select _c4,sum(_c10) total_per from aadhaar group by _c4) as per2 on per1._c4=per2._c4 order by percentage DESC LIMIT 3
